@@ -1,0 +1,6 @@
+{
+  "name": "Kamadenu HR Management System (KHRMS)",
+  "description": "Enterprise HR & Recruitment Management System for Kamadenu HR Consultancy featuring AI resume parsing, candidate matching, attendance tracking, payroll, employee management, and comprehensive HR analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
