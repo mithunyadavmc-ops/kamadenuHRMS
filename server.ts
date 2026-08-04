@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
@@ -24,6 +25,7 @@ const ADMIN_LOGIN = {
   password: 'admin123'
 };
 
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: "10mb" }));
 
 // In-Memory Database Store (with persistent state during runtime)
@@ -62,14 +64,13 @@ function getGeminiClient() {
 // ----------------------------------------------------
 
 // 1. Auth APIs
-app.post("/api/v1/auth/login", (req, res) => {
-  const { username, password, role } = req.body;
+const handleLogin = (req: any, res: any) => {
+  const { username, password, role } = req.body || {};
 
   if (username !== ADMIN_LOGIN.username || password !== ADMIN_LOGIN.password) {
-    return res.status(401).json({ error: "Invalid admin credentials" });
+    return res.status(401).json({ error: "Invalid username or password" });
   }
-  
-  // Find matching or default user
+
   const roleName = role || "super_admin";
   const user = {
     ...dbUser,
@@ -78,7 +79,6 @@ app.post("/api/v1/auth/login", (req, res) => {
     email: 'admin@kamadenu.com'
   };
 
-  // Log audit
   dbAuditLogs.unshift({
     id: `log-${Date.now()}`,
     userId: user.id,
@@ -95,9 +95,11 @@ app.post("/api/v1/auth/login", (req, res) => {
     token: `khrms-jwt-token-${Date.now()}`,
     user
   });
-});
+};
 
-app.get("/api/v1/auth/me", (req, res) => {
+app.post(["/api/v1/auth/login", "/api/v1/login", "/auth/login", "/api/login", "/login"], handleLogin);
+
+app.get(["/api/v1/auth/me", "/auth/me", "/api/v1/me", "/me"], (req, res) => {
   return res.json({ user: dbUser });
 });
 

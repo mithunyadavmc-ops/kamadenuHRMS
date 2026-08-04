@@ -13,7 +13,20 @@ import {
   User
 } from '../types';
 
-const API_BASE = '/api/v1';
+function getApiBase(): string {
+  const configuredUrl = (import.meta.env.VITE_API_URL || '').trim().replace(/\/$/, '');
+  if (configuredUrl) {
+    return `${configuredUrl}/api/v1`;
+  }
+
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    return `${window.location.origin}/api/v1`;
+  }
+
+  return '/api/v1';
+}
+
+const API_BASE = getApiBase();
 
 async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, {
@@ -21,15 +34,27 @@ async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
       'Content-Type': 'application/json',
       ...options?.headers,
     },
+    credentials: 'include',
     ...options,
   });
 
+  const contentType = res.headers.get('content-type') || '';
+  const payload = contentType.includes('application/json')
+    ? await res.json().catch(() => null)
+    : await res.text().catch(() => null);
+
   if (!res.ok) {
-    const errData = await res.json().catch(() => ({}));
-    throw new Error(errData.error || `Request failed with status ${res.status}`);
+    const errorMessage = typeof payload === 'object' && payload && 'error' in payload
+      ? String(payload.error)
+      : typeof payload === 'object' && payload && 'detail' in payload
+        ? String(payload.detail)
+        : typeof payload === 'string' && payload
+          ? payload
+          : `Request failed with status ${res.status}`;
+    throw new Error(errorMessage);
   }
 
-  return res.json();
+  return (payload ?? {}) as T;
 }
 
 export const apiService = {
