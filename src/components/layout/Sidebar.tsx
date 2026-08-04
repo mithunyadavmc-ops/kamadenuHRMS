@@ -164,7 +164,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <button
                     key={item.id}
                     onClick={() => handleNavClick(item.id)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-md font-medium text-sm transition-colors ${
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-md font-medium text-[20px] transition-colors ${
                       isActive
                         ? 'bg-blue-50 text-[#2563EB]'
                         : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
@@ -204,7 +204,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <button
                     key={item.id}
                     onClick={() => handleNavClick(item.id)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-md font-medium text-sm transition-colors ${
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-md font-medium text-[20px] transition-colors ${
                       isActive
                         ? 'bg-blue-50 text-[#2563EB]'
                         : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
