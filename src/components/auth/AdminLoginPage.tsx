@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AlertCircle, CheckCircle2, Eye, EyeOff, LoaderCircle, Lock, Sparkles, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { KamadhenuLogo } from '../layout/KamadhenuLogo';
 
@@ -11,6 +12,7 @@ type LoginFormValues = {
 };
 
 export const AdminLoginPage: React.FC = () => {
+  const navigate = useNavigate();
   const { login, completeLogin } = useAuth();
   const [formValues, setFormValues] = useState<LoginFormValues>({
     username: '',
@@ -45,6 +47,7 @@ export const AdminLoginPage: React.FC = () => {
       const signedInUser = await login(formValues.username.trim(), formValues.password);
       completeLogin(signedInUser, formValues.rememberMe);
       setStatusMessage('Login successful. Redirecting to your dashboard...');
+      navigate('/dashboard', { replace: true });
     } catch (loginError) {
       const message = loginError instanceof Error ? loginError.message : 'Invalid username or password.';
       setError(message);
