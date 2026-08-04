@@ -19,6 +19,10 @@ import {
 
 const app = express();
 const PORT = 3000;
+const ADMIN_LOGIN = {
+  username: 'admin',
+  password: 'admin123'
+};
 
 app.use(express.json({ limit: "10mb" }));
 
@@ -59,14 +63,19 @@ function getGeminiClient() {
 
 // 1. Auth APIs
 app.post("/api/v1/auth/login", (req, res) => {
-  const { email, password, role } = req.body;
+  const { username, password, role } = req.body;
+
+  if (username !== ADMIN_LOGIN.username || password !== ADMIN_LOGIN.password) {
+    return res.status(401).json({ error: "Invalid admin credentials" });
+  }
   
   // Find matching or default user
   const roleName = role || "super_admin";
   const user = {
     ...dbUser,
+    name: 'Admin',
     role: roleName,
-    email: email || dbUser.email
+    email: 'admin@kamadenu.com'
   };
 
   // Log audit

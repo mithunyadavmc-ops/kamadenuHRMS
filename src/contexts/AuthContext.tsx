@@ -6,46 +6,62 @@ interface AuthContextType {
   user: User | null;
   role: UserRole;
   isAuthenticated: boolean;
-  login: (email: string, role: UserRole) => Promise<void>;
+  login: (username: string, password: string) => Promise<User>;
+  completeLogin: (user: User, rememberMe?: boolean) => void;
   logout: () => void;
   switchRole: (role: UserRole) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>({
-    id: 'usr-101',
-    name: 'Anil Yadav',
-    email: 'anil.yadav@kamadenu.com',
-    role: 'super_admin',
-    department: 'Executive Leadership',
-    title: 'Managing Director & Head of Talent',
-    phone: '+91 98450 12345',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
-    createdAt: '2024-01-15'
-  });
+const AUTH_STORAGE_KEY = 'khrms-auth-user';
 
-  const login = async (email: string, role: UserRole) => {
-    try {
-      const res = await apiService.login(email, role);
-      setUser(res.user);
-    } catch (err) {
-      // Fallback
-      setUser({
-        id: `usr-${Date.now()}`,
-        name: email.split('@')[0].replace('.', ' ').toUpperCase(),
-        email,
-        role,
-        department: 'Human Resources',
-        title: `${role.toUpperCase().replace('_', ' ')} Specialist`,
-        createdAt: new Date().toISOString().substring(0, 10)
-      });
+const readStoredUser = (): User | null => {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const storedUser = window.localStorage.getItem(AUTH_STORAGE_KEY) || window.sessionStorage.getItem(AUTH_STORAGE_KEY);
+
+  if (!storedUser) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(storedUser) as User;
+  } catch {
+    return null;
+  }
+};
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(() => readStoredUser());
+
+  const login = async (username: string, password: string) => {
+    const res = await apiService.login(username, password);
+    return res.user;
+  };
+
+  const completeLogin = (signedInUser: User, rememberMe = true) => {
+    setUser(signedInUser);
+
+    if (typeof window === 'undefined') {
+      return;
     }
+
+    window.localStorage.removeItem(AUTH_STORAGE_KEY);
+    window.sessionStorage.removeItem(AUTH_STORAGE_KEY);
+
+    const storage = rememberMe ? window.localStorage : window.sessionStorage;
+    storage.setItem(AUTH_STORAGE_KEY, JSON.stringify(signedInUser));
   };
 
   const logout = () => {
     setUser(null);
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem(AUTH_STORAGE_KEY);
+      window.sessionStorage.removeItem(AUTH_STORAGE_KEY);
+    }
   };
 
   const switchRole = (newRole: UserRole) => {
@@ -61,6 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         role: user?.role || 'super_admin',
         isAuthenticated: !!user,
         login,
+        completeLogin,
         logout,
         switchRole
       }}

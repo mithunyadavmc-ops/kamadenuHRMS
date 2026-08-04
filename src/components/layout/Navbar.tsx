@@ -213,6 +213,14 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="w-10 h-10 bg-slate-100 border border-slate-200 rounded-full flex items-center justify-center font-bold text-[#2563EB] text-xs shadow-xs">
             {getInitials(user?.name)}
           </div>
+          <button
+            onClick={logout}
+            className="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg transition-colors"
+            id="logout-btn"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Logout</span>
+          </button>
         </div>
       </div>
     </header>

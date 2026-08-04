@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Navbar } from './components/layout/Navbar';
 import { Sidebar } from './components/layout/Sidebar';
 import { AiAssistantModal } from './components/ai/AiAssistantModal';
 import { AiResumeParserModal } from './components/ai/AiResumeParserModal';
+import { AdminLoginPage } from './components/auth/AdminLoginPage';
 
 // Pages
 import { DashboardPage } from './pages/DashboardPage';
@@ -25,6 +26,18 @@ const AppContent: React.FC = () => {
   const [isAiAssistantOpen, setIsAiAssistantOpen] = useState(false);
   const [isResumeParserOpen, setIsResumeParserOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const wasAuthenticatedRef = useRef(false);
+
+  useEffect(() => {
+    if (user && !wasAuthenticatedRef.current) {
+      setCurrentPage('dashboard');
+    }
+    wasAuthenticatedRef.current = !!user;
+  }, [user]);
+
+  if (!user) {
+    return <AdminLoginPage />;
+  }
 
   const renderCurrentPage = () => {
     switch (currentPage) {
