@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { KamadhenuLogo } from '../layout/KamadhenuLogo';
+import kamadhenuLogo from '../../../assets/logo/WhatsApp Image 2026-07-27 at 7.33.31 PM.jpeg';
 
 const Login3DScene = React.lazy(() => import('./Login3DScene'));
 
@@ -121,6 +122,13 @@ export const AdminLoginPage: React.FC = () => {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#050816] text-white">
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden opacity-[0.22] lg:opacity-[0.28]">
+        <img
+          src={kamadhenuLogo}
+          alt="Kamadhenu HR Consultancy"
+          className="h-[120vh] w-[120vw] max-w-none object-contain blur-[0.15px]"
+        />
+      </div>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(37,99,235,0.28),transparent_28%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.18),transparent_24%),radial-gradient(circle_at_bottom,rgba(96,165,250,0.16),transparent_35%),linear-gradient(180deg,#050816_0%,#0F172A_52%,#111827_100%)]" />
       <div className="absolute inset-0 opacity-70 mix-blend-screen bg-[linear-gradient(115deg,transparent_0%,rgba(148,163,184,0.08)_25%,transparent_50%,rgba(59,130,246,0.12)_70%,transparent_100%)] animate-[pulse_14s_ease-in-out_infinite]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(2,6,23,0.24)_45%,rgba(2,6,23,0.72)_100%)]" />
