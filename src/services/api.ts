@@ -98,15 +98,7 @@ export const apiService = {
       };
     }
 
-    try {
-      return await fetchJson<{ token: string; user: User }>(`${API_BASE}/auth/login`, {
-        method: 'POST',
-        body: JSON.stringify({ username, password }),
-      });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Invalid username or password.';
-      throw new Error(message);
-    }
+    throw new Error('Invalid username or password.');
   },
 
   getCurrentUser: async () => {
