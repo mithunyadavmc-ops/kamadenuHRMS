@@ -144,23 +144,9 @@ export const apiService = {
     } catch {
       return {
         metrics: INITIAL_METRICS,
-        hiringTrendData: [
-          { month: 'Jan', hires: 12, applications: 240, payrollLakhs: 172 },
-          { month: 'Feb', hires: 15, applications: 310, payrollLakhs: 175 },
-          { month: 'Mar', hires: 19, applications: 450, payrollLakhs: 178 },
-          { month: 'Apr', hires: 14, applications: 380, payrollLakhs: 180 },
-          { month: 'May', hires: 22, applications: 520, payrollLakhs: 182 },
-          { month: 'Jun', hires: 25, applications: 610, payrollLakhs: 184 },
-          { month: 'Jul', hires: 18, applications: 580, payrollLakhs: 184.5 },
-        ],
-        departmentData: [
-          { name: 'Talent Acquisition', count: 45, value: 30 },
-          { name: 'Technical Sourcing', count: 38, value: 26 },
-          { name: 'Payroll & Compliance', count: 22, value: 15 },
-          { name: 'Client Relations', count: 28, value: 19 },
-          { name: 'Executive Leadership', count: 15, value: 10 },
-        ],
-        recentNotifications: INITIAL_NOTIFICATIONS.slice(0, 5),
+        hiringTrendData: [],
+        departmentData: [],
+        recentNotifications: [],
       };
     }
   },
@@ -171,7 +157,7 @@ export const apiService = {
       const query = new URLSearchParams(params as any).toString();
       return await fetchJson<{ employees: Employee[]; total: number }>(`${API_BASE}/employees?${query}`);
     } catch {
-      return { employees: INITIAL_EMPLOYEES, total: INITIAL_EMPLOYEES.length };
+      return { employees: [], total: 0 };
     }
   },
 
@@ -200,7 +186,7 @@ export const apiService = {
     try {
       return await fetchJson<{ companies: ClientCompany[] }>(`${API_BASE}/companies`);
     } catch {
-      return { companies: INITIAL_CLIENT_COMPANIES };
+      return { companies: [] };
     }
   },
 
@@ -216,7 +202,7 @@ export const apiService = {
     try {
       return await fetchJson<{ jobs: JobPosting[] }>(`${API_BASE}/jobs`);
     } catch {
-      return { jobs: INITIAL_JOB_POSTINGS };
+      return { jobs: [] };
     }
   },
 
@@ -239,7 +225,7 @@ export const apiService = {
     try {
       return await fetchJson<{ candidates: Candidate[] }>(`${API_BASE}/candidates`);
     } catch {
-      return { candidates: INITIAL_CANDIDATES };
+      return { candidates: [] };
     }
   },
 
@@ -262,7 +248,7 @@ export const apiService = {
     try {
       return await fetchJson<{ attendance: AttendanceRecord[] }>(`${API_BASE}/attendance`);
     } catch {
-      return { attendance: INITIAL_ATTENDANCE };
+      return { attendance: [] };
     }
   },
 
@@ -278,7 +264,7 @@ export const apiService = {
     try {
       return await fetchJson<{ leaves: LeaveRequest[] }>(`${API_BASE}/leaves`);
     } catch {
-      return { leaves: INITIAL_LEAVES };
+      return { leaves: [] };
     }
   },
 
@@ -301,7 +287,7 @@ export const apiService = {
     try {
       return await fetchJson<{ payroll: PayrollRecord[] }>(`${API_BASE}/payroll`);
     } catch {
-      return { payroll: INITIAL_PAYROLL };
+      return { payroll: [] };
     }
   },
 
@@ -317,7 +303,7 @@ export const apiService = {
     try {
       return await fetchJson<{ documents: DocumentItem[] }>(`${API_BASE}/documents`);
     } catch {
-      return { documents: INITIAL_DOCUMENTS };
+      return { documents: [] };
     }
   },
 
@@ -333,7 +319,7 @@ export const apiService = {
     try {
       return await fetchJson<{ notifications: NotificationItem[] }>(`${API_BASE}/notifications`);
     } catch {
-      return { notifications: INITIAL_NOTIFICATIONS };
+      return { notifications: [] };
     }
   },
 
@@ -341,7 +327,7 @@ export const apiService = {
     try {
       return await fetchJson<{ auditLogs: AuditLogItem[] }>(`${API_BASE}/audit-logs`);
     } catch {
-      return { auditLogs: INITIAL_AUDIT_LOGS };
+      return { auditLogs: [] };
     }
   },
 
