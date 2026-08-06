@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { HashRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Navbar } from './components/layout/Navbar';
@@ -25,11 +25,40 @@ interface AppShellProps {
   page: string;
 }
 
+type PageId = 'dashboard' | 'employees' | 'recruitment' | 'jobs' | 'candidates' | 'companies' | 'attendance' | 'leave' | 'payroll' | 'documents' | 'reports' | 'settings';
+
+const getPageFromPath = (pathname: string): PageId => {
+  const normalizedPath = pathname.replace(/^\/+|\/+$/g, '') || 'dashboard';
+  const pageMap: Record<string, PageId> = {
+    dashboard: 'dashboard',
+    employees: 'employees',
+    recruitment: 'recruitment',
+    jobs: 'jobs',
+    candidates: 'candidates',
+    companies: 'companies',
+    attendance: 'attendance',
+    leave: 'leave',
+    payroll: 'payroll',
+    documents: 'documents',
+    reports: 'reports',
+    settings: 'settings'
+  };
+
+  return pageMap[normalizedPath] ?? 'dashboard';
+};
+
 const AppShell: React.FC<AppShellProps> = ({ page }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isAiAssistantOpen, setIsAiAssistantOpen] = useState(false);
   const [isResumeParserOpen, setIsResumeParserOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const activePage = getPageFromPath(location.pathname) || page;
+
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
 
   const handleNavigate = (nextPage: string) => {
     const nextPath = nextPage === 'dashboard' ? '/dashboard' : `/${nextPage}`;
@@ -37,7 +66,7 @@ const AppShell: React.FC<AppShellProps> = ({ page }) => {
   };
 
   const renderCurrentPage = () => {
-    switch (page) {
+    switch (activePage) {
       case 'dashboard':
         return (
           <DashboardPage
@@ -86,7 +115,7 @@ const AppShell: React.FC<AppShellProps> = ({ page }) => {
   return (
     <div className="min-h-screen h-screen bg-[#F8FAFC] flex flex-col text-[#0F172A] font-sans antialiased overflow-hidden">
       <Navbar
-        activePage={page}
+        activePage={activePage}
         onNavigate={handleNavigate}
         onOpenAiAssistant={() => setIsAiAssistantOpen(true)}
         onOpenResumeParser={() => setIsResumeParserOpen(true)}
@@ -96,7 +125,7 @@ const AppShell: React.FC<AppShellProps> = ({ page }) => {
 
       <div className="flex-1 flex overflow-hidden">
         <Sidebar
-          activePage={page}
+          activePage={activePage}
           onNavigate={handleNavigate}
           isMobileMenuOpen={isMobileMenuOpen}
           setIsMobileMenuOpen={setIsMobileMenuOpen}

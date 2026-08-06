@@ -16,6 +16,30 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const AUTH_STORAGE_KEY = 'khrms-auth-user';
 
+const persistUser = (userToStore: User, rememberMe = true) => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  window.localStorage.removeItem(AUTH_STORAGE_KEY);
+  window.sessionStorage.removeItem(AUTH_STORAGE_KEY);
+
+  const storage = rememberMe ? window.localStorage : window.sessionStorage;
+  storage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userToStore));
+};
+
+const updateStoredUser = (nextUser: User) => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  const hasLocalStorage = window.localStorage.getItem(AUTH_STORAGE_KEY);
+  const hasSessionStorage = window.sessionStorage.getItem(AUTH_STORAGE_KEY);
+  const storage = hasLocalStorage ? window.localStorage : hasSessionStorage ? window.sessionStorage : window.localStorage;
+
+  storage.setItem(AUTH_STORAGE_KEY, JSON.stringify(nextUser));
+};
+
 const readStoredUser = (): User | null => {
   if (typeof window === 'undefined') {
     return null;
@@ -44,16 +68,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const completeLogin = (signedInUser: User, rememberMe = true) => {
     setUser(signedInUser);
-
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    window.localStorage.removeItem(AUTH_STORAGE_KEY);
-    window.sessionStorage.removeItem(AUTH_STORAGE_KEY);
-
-    const storage = rememberMe ? window.localStorage : window.sessionStorage;
-    storage.setItem(AUTH_STORAGE_KEY, JSON.stringify(signedInUser));
+    persistUser(signedInUser, rememberMe);
   };
 
   const logout = () => {
@@ -66,7 +81,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const switchRole = (newRole: UserRole) => {
     if (user) {
-      setUser({ ...user, role: newRole });
+      const nextUser = { ...user, role: newRole };
+      setUser(nextUser);
+      updateStoredUser(nextUser);
     }
   };
 
