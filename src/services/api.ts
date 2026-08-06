@@ -12,6 +12,20 @@ import {
   DashboardMetrics,
   User
 } from '../types';
+import {
+  INITIAL_METRICS,
+  INITIAL_EMPLOYEES,
+  INITIAL_CLIENT_COMPANIES,
+  INITIAL_JOB_POSTINGS,
+  INITIAL_CANDIDATES,
+  INITIAL_ATTENDANCE,
+  INITIAL_LEAVES,
+  INITIAL_PAYROLL,
+  INITIAL_DOCUMENTS,
+  INITIAL_NOTIFICATIONS,
+  INITIAL_AUDIT_LOGS,
+  INITIAL_USER
+} from '../data/mockData';
 
 function getApiBase(): string {
   const configuredUrl = (import.meta.env.VITE_API_URL || '').trim().replace(/\/$/, '');
@@ -71,6 +85,10 @@ async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
     throw new Error(errorMessage);
   }
 
+  if (!contentType.includes('application/json')) {
+    throw new Error('Unexpected non-JSON response from server.');
+  }
+
   return (payload ?? {}) as T;
 }
 
@@ -125,16 +143,7 @@ export const apiService = {
       }>(`${API_BASE}/dashboard/metrics`);
     } catch {
       return {
-        metrics: {
-          totalEmployees: 148,
-          activeJobs: 32,
-          totalCandidates: 1240,
-          attendanceRate: 96.4,
-          monthlyPayroll: 18450000,
-          monthlyRevenue: 34200000,
-          pendingLeaves: 7,
-          hiresThisMonth: 18,
-        },
+        metrics: INITIAL_METRICS,
         hiringTrendData: [
           { month: 'Jan', hires: 12, applications: 240, payrollLakhs: 172 },
           { month: 'Feb', hires: 15, applications: 310, payrollLakhs: 175 },
@@ -151,15 +160,19 @@ export const apiService = {
           { name: 'Client Relations', count: 28, value: 19 },
           { name: 'Executive Leadership', count: 15, value: 10 },
         ],
-        recentNotifications: [],
+        recentNotifications: INITIAL_NOTIFICATIONS.slice(0, 5),
       };
     }
   },
 
   // Employees
   getEmployees: async (params?: { search?: string; department?: string; status?: string }) => {
-    const query = new URLSearchParams(params as any).toString();
-    return fetchJson<{ employees: Employee[]; total: number }>(`${API_BASE}/employees?${query}`);
+    try {
+      const query = new URLSearchParams(params as any).toString();
+      return await fetchJson<{ employees: Employee[]; total: number }>(`${API_BASE}/employees?${query}`);
+    } catch {
+      return { employees: INITIAL_EMPLOYEES, total: INITIAL_EMPLOYEES.length };
+    }
   },
 
   createEmployee: async (data: Partial<Employee>) => {
@@ -184,7 +197,11 @@ export const apiService = {
 
   // Client Companies
   getCompanies: async () => {
-    return fetchJson<{ companies: ClientCompany[] }>(`${API_BASE}/companies`);
+    try {
+      return await fetchJson<{ companies: ClientCompany[] }>(`${API_BASE}/companies`);
+    } catch {
+      return { companies: INITIAL_CLIENT_COMPANIES };
+    }
   },
 
   createCompany: async (data: Partial<ClientCompany>) => {
@@ -196,7 +213,11 @@ export const apiService = {
 
   // Jobs
   getJobs: async () => {
-    return fetchJson<{ jobs: JobPosting[] }>(`${API_BASE}/jobs`);
+    try {
+      return await fetchJson<{ jobs: JobPosting[] }>(`${API_BASE}/jobs`);
+    } catch {
+      return { jobs: INITIAL_JOB_POSTINGS };
+    }
   },
 
   createJob: async (data: Partial<JobPosting>) => {
@@ -215,7 +236,11 @@ export const apiService = {
 
   // Candidates
   getCandidates: async () => {
-    return fetchJson<{ candidates: Candidate[] }>(`${API_BASE}/candidates`);
+    try {
+      return await fetchJson<{ candidates: Candidate[] }>(`${API_BASE}/candidates`);
+    } catch {
+      return { candidates: INITIAL_CANDIDATES };
+    }
   },
 
   createCandidate: async (data: Partial<Candidate>) => {
@@ -234,7 +259,11 @@ export const apiService = {
 
   // Attendance
   getAttendance: async () => {
-    return fetchJson<{ attendance: AttendanceRecord[] }>(`${API_BASE}/attendance`);
+    try {
+      return await fetchJson<{ attendance: AttendanceRecord[] }>(`${API_BASE}/attendance`);
+    } catch {
+      return { attendance: INITIAL_ATTENDANCE };
+    }
   },
 
   punchAttendance: async (employeeId: string, type: 'in' | 'out', verificationMethod?: string) => {
@@ -246,7 +275,11 @@ export const apiService = {
 
   // Leaves
   getLeaves: async () => {
-    return fetchJson<{ leaves: LeaveRequest[] }>(`${API_BASE}/leaves`);
+    try {
+      return await fetchJson<{ leaves: LeaveRequest[] }>(`${API_BASE}/leaves`);
+    } catch {
+      return { leaves: INITIAL_LEAVES };
+    }
   },
 
   createLeave: async (data: Partial<LeaveRequest>) => {
@@ -265,7 +298,11 @@ export const apiService = {
 
   // Payroll
   getPayroll: async () => {
-    return fetchJson<{ payroll: PayrollRecord[] }>(`${API_BASE}/payroll`);
+    try {
+      return await fetchJson<{ payroll: PayrollRecord[] }>(`${API_BASE}/payroll`);
+    } catch {
+      return { payroll: INITIAL_PAYROLL };
+    }
   },
 
   processPayrollBatch: async (month: string) => {
@@ -277,7 +314,11 @@ export const apiService = {
 
   // Documents
   getDocuments: async () => {
-    return fetchJson<{ documents: DocumentItem[] }>(`${API_BASE}/documents`);
+    try {
+      return await fetchJson<{ documents: DocumentItem[] }>(`${API_BASE}/documents`);
+    } catch {
+      return { documents: INITIAL_DOCUMENTS };
+    }
   },
 
   createDocument: async (data: Partial<DocumentItem>) => {
@@ -289,11 +330,19 @@ export const apiService = {
 
   // Audit Logs & Notifications
   getNotifications: async () => {
-    return fetchJson<{ notifications: NotificationItem[] }>(`${API_BASE}/notifications`);
+    try {
+      return await fetchJson<{ notifications: NotificationItem[] }>(`${API_BASE}/notifications`);
+    } catch {
+      return { notifications: INITIAL_NOTIFICATIONS };
+    }
   },
 
   getAuditLogs: async () => {
-    return fetchJson<{ auditLogs: AuditLogItem[] }>(`${API_BASE}/audit-logs`);
+    try {
+      return await fetchJson<{ auditLogs: AuditLogItem[] }>(`${API_BASE}/audit-logs`);
+    } catch {
+      return { auditLogs: INITIAL_AUDIT_LOGS };
+    }
   },
 
   // AI Features

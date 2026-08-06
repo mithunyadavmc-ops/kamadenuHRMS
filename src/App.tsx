@@ -1,4 +1,42 @@
 import React, { useEffect, useState } from 'react';
+
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; error: Error | null }> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error) {
+    console.error('Unhandled UI error:', error);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-6">
+          <div className="max-w-md rounded-2xl border border-white/10 bg-white/10 p-6 text-center backdrop-blur">
+            <h1 className="text-xl font-semibold">Something went wrong</h1>
+            <p className="mt-3 text-sm text-slate-300">
+              The page hit an unexpected error. Please refresh the app or return to the dashboard.
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white"
+            >
+              Reload App
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 import { HashRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Navbar } from './components/layout/Navbar';
@@ -202,11 +240,13 @@ const AppRoutes: React.FC = () => {
 
 export function App() {
   return (
-    <AuthProvider>
-      <HashRouter>
-        <AppRoutes />
-      </HashRouter>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <HashRouter>
+          <AppRoutes />
+        </HashRouter>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
